@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import chisquare
 from typing import Dict, List, Tuple, Callable, Any
 from generate_test_files import generate_test_files
+import pandas as pd
 
 class HashFunctionTester:
     def __init__(self):
@@ -257,6 +258,24 @@ class HashFunctionTester:
         
         print("Результаты сохранены в results/test_results.csv")
 
+    def save_results_to_excel(self):
+        data = []
+        for filename, func_results in self.results.items():
+            for func_name, res in func_results.items():
+                data.append({
+                'Filename': filename,
+                'Hash Function': func_name,
+                'Time (s)': res['time'],
+                'Collisions': res['collisions'],
+                'Collision Rate (%)': res['collision_rate'] * 100,
+                'Unique Hashes': res['unique_hashes'],
+                'Chi-square': res['chi2'],
+                'p-value': res['p_value']
+            })
+    
+        df = pd.DataFrame(data)
+        df.to_excel('results/test_results.xlsx', index=False, float_format="%.6f")
+        
 def main():
     """Основная функция программы"""
     tester = HashFunctionTester()
@@ -280,6 +299,7 @@ def main():
         
         # 5. Сохранение
         tester.save_results_to_csv()
+        tester.save_results_to_excel()
         
         print("\nТестирование завершено!")
     except Exception as e:
